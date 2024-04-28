@@ -3,7 +3,7 @@ name: Main Kittygram workflow
 on:
   push:
     branches:
-      - main
+      - '*' 
 
 jobs:
   tests:
@@ -51,6 +51,7 @@ jobs:
   build_and_push_to_docker_hub:
     name: Push Docker image to DockerHub
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     needs: tests
     steps:
       - name: Check out the repo
@@ -86,7 +87,6 @@ jobs:
         run: |
           cd frontend/
           npm ci
-
       - name: Test frontend
         run: |
           cd frontend/
@@ -96,6 +96,7 @@ jobs:
 
     name: Push frontend Docker image to DockerHub
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     needs: frontend_tests
     steps:
       - name: Check out the repo
@@ -116,10 +117,11 @@ jobs:
           tags: enshx/kittygram_frontend:latest
 
 
-  build_gateway_and_push_to_docker_hub: 
+  build_gateway_and_push_to_docker_hub:
 
     name: Push gateway Docker image to DockerHub
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -139,6 +141,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     needs: 
       - build_and_push_to_docker_hub
       - build_frontend_and_push_to_docker_hub
@@ -174,6 +177,7 @@ jobs:
           
   send_message:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     needs: deploy
     steps:
     - name: Send message
